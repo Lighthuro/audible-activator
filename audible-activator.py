@@ -76,20 +76,7 @@ def fetch_activation_bytes(username, password, options):
     if options.firefox:
         driver = webdriver.Firefox()
     else:
-        if sys.platform == 'win32':
-            chromedriver_path = "chromedriver.exe"
-        elif os.path.isfile("/usr/bin/chromedriver"):  # Debian/Ubuntu package's chromedriver path
-            chromedriver_path = "/usr/bin/chromedriver"
-        elif os.path.isfile("/usr/lib/chromium-browser/chromedriver"):  # Ubuntu package chromedriver path
-            chromedriver_path = "/usr/lib/chromium-browser/chromedriver"
-        elif os.path.isfile("/usr/local/bin/chromedriver"):  # macOS + Homebrew
-            chromedriver_path = "/usr/local/bin/chromedriver"
-        else:
-            chromedriver_path = "./chromedriver"
-
-
-        driver = webdriver.Chrome(options=opts,
-                                  executable_path=chromedriver_path)
+        driver = webdriver.Chrome(options=opts)
 
     query_string = urlencode(payload)
     url = login_url + query_string
@@ -99,9 +86,11 @@ def fetch_activation_bytes(username, password, options):
         print("[!] Running in DEBUG mode. You will need to login in a semi-automatic way, wait for the login screen to show up ;)")
         time.sleep(32)
     else:
-        search_box = driver.find_element_by_id('ap_email')
+        search_box = driver.find_element(by="id", value="ap_email")
         search_box.send_keys(username)
-        search_box = driver.find_element_by_id('ap_password')
+        search_box.submit()
+        time.sleep(2)
+        search_box = driver.find_element(by="id", value='ap_password')
         search_box.send_keys(password)
         search_box.submit()
         time.sleep(2)  # give the page some time to load
